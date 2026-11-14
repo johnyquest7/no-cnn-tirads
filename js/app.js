@@ -171,10 +171,15 @@ function analyse(){
 }
 
 /* ---------- self-check ---------- */
-// On every load the page analyses the bundled sample and compares all measurements and the
+// On demand, the page analyses the bundled sample and compares all measurements and the
 // TI-RADS call with what the original Python pipeline produced for the same image and box.
-state.selfTest = (async () => {
-  await new Promise(r => setTimeout(r, 60));
+function offerSelfCheck(){
+  setEngine('', 'Not yet checked in this browser. <button type="button" class="linkbtn" id="selfcheck">Run self-check</button>');
+  $('#selfcheck').onclick = () => { runSelfCheck(); };
+}
+const runSelfCheck = () => (async () => {
+  setEngine('loading', 'Running the self-check&hellip;');
+  await new Promise(r => setTimeout(r, 60));               // let the status line paint first
   const M = IWSP.MODEL, g = M.golden, T = M.tolerance;
   const dec = await IWSP.decodeFile(await sampleFile()), p = IWSP.limitSize(dec.gray, dec.h, dec.w);
   const res = IWSP.analyseGray(p.gray, p.h, p.w, M.sample.box);
@@ -193,13 +198,14 @@ state.selfTest = (async () => {
       Python pipeline <span class="mono">(largest difference ${worst.toExponential(1)})</span>`);
   else setEngine('warn', `<strong>Self-check mismatch.</strong> In this browser ${bad.length} of ${n} measurements differ from the
       reference pipeline${sameCall ? '' : ', and the sample scores a different TI-RADS level'}. Results may not match the validated model.`);
-  $('#buildinfo').textContent = `JavaScript port of segment.py (md5 ${M.source_md5['segment.py'].slice(0,8)}) and features.py ` +
-      `(md5 ${M.source_md5['features.py'].slice(0,8)}) · model data exported ${M.built}`;
   return c;
 })().catch(err => {
   setEngine('bad', `<strong>The self-check could not run.</strong> ${escapeHtml(err.message || String(err))}`);
   return {ok:false, error:String(err)};
 });
+offerSelfCheck();
+$('#buildinfo').textContent = `JavaScript port of segment.py (md5 ${IWSP.MODEL.source_md5['segment.py'].slice(0,8)}) and features.py ` +
+    `(md5 ${IWSP.MODEL.source_md5['features.py'].slice(0,8)}) · model data exported ${IWSP.MODEL.built}`;
 
 /* ---------- report ---------- */
 const RISK = {1:['Benign','No follow-up required under ACR TI-RADS.'],
@@ -320,12 +326,12 @@ function fmt(v){
   return (Math.round(v * 1000) / 1000).toString();
 }
 
-if (location.hash === '#sample') state.selfTest.then(() => runSample()).catch(err => showError(err.message || String(err)));
+if (location.hash === '#sample') runSample().catch(err => showError(err.message || String(err)));
 
 $('#fsearch').oninput = e => {
   const q = e.target.value.toLowerCase();
   for (const tr of $('#ftbody').children)
     tr.hidden = q && !tr.textContent.toLowerCase().includes(q);
 };
-window.IWSP_APP = {state, runSample, analyse, loadFile};
+window.IWSP_APP = {state, runSample, analyse, loadFile, runSelfCheck};
 })();

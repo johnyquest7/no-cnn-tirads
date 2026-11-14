@@ -25,7 +25,7 @@
       <div class="sub">Hand-written segmentation and named features &mdash; no neural network anywhere in the pipeline</div>
     </div>
   </div>
-  <div class="warn"><strong>Research tool, not a medical device.</strong> Trained on 2,260 labelled images; several descriptors are only moderately reliable. Every score below is shown with the evidence it came from so you can check it.</div>
+  <div class="warn"><strong>Research tool, not a medical device.</strong> Several descriptors are only moderately reliable. Every score below is shown with the evidence it came from so you can check it.</div>
 </header>
 
 <div class="grid">
@@ -34,8 +34,8 @@
     <section class="card">
       <div class="card-h"><h2><span class="step">1</span>Image and nodule box</h2>
         <span class="status" id="imgmeta"></span></div>
-      <div class="engine loading" id="engine" role="status" aria-live="polite">
-        <span class="dot"></span><span id="enginetxt">Running the self-check&hellip;</span></div>
+      <div class="engine" id="engine" role="status" aria-live="polite">
+        <span class="dot"></span><span id="enginetxt"></span></div>
       <div class="card-b">
         <div id="drop">
           <strong>Drop an ultrasound image here</strong>

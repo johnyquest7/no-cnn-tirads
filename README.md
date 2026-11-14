@@ -78,9 +78,10 @@ vertices outside the image and self-intersections (400), area resize for images 
 640 px (9 sizes), morphology, labelling and the distance transform (60), and the disk
 opening (60).
 
-On every load the page also runs a **self-check**: it analyses the bundled sample and
-compares all 56 measurements and the TI-RADS call with the Python reference. The result is
-shown above the image; a mismatch is shown as a warning.
+The page also has a **self-check**, run on demand from the "Run self-check" link above the
+image (it is not run at load, to keep start-up instant): it analyses the bundled sample and
+compares all 56 measurements and the TI-RADS call with the Python reference. A mismatch is
+shown as a warning.
 
 ## Keeping it in step with the Python
 
@@ -109,6 +110,6 @@ python Java_web/tools/verify_parity.py --n 300
   8 bits by the browser, where the Python pipeline rescales them, so those can differ.
 - JPEGs are analysed as stored: EXIF rotation is not applied, in the page or in Python.
 - Parity was measured in Chromium. Other browsers run the same JavaScript and report
-  their own self-check; their JPEG decoders may differ from OpenCV's by a gray level.
+  their own self-check when you run it; their JPEG decoders may differ from OpenCV's by a gray level.
 - The box matters, as in the local app: the model was validated on boxes about
   1.0–1.3× the nodule.
