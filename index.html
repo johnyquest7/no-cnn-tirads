@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iWSP TI-RADS</title>
+<meta name="description" content="ACR TI-RADS scoring of a thyroid nodule from an ultrasound image, with the evidence behind every point. Runs entirely in the browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#04211f" stroke-width="2.1" stroke-linecap="round">
+        <path d="M3 17c3.5 0 3.5-10 7-10s3.5 10 7 10 3.5-4 4-4"/>
+      </svg>
+    </div>
+    <div>
+      <h1>iWSP TI-RADS</h1>
+      <div class="sub">Hand-written segmentation and named features &mdash; no neural network anywhere in the pipeline</div>
+    </div>
+  </div>
+  <div class="warn"><strong>Research tool, not a medical device.</strong> Trained on 2,260 labelled images; several descriptors are only moderately reliable. Every score below is shown with the evidence it came from so you can check it.</div>
+</header>
+
+<div class="grid">
+  <!-- ============ left: viewer ============ -->
+  <div>
+    <section class="card">
+      <div class="card-h"><h2><span class="step">1</span>Image and nodule box</h2>
+        <span class="status" id="imgmeta"></span></div>
+      <div class="engine loading" id="engine" role="status" aria-live="polite">
+        <span class="dot"></span><span id="enginetxt">Running the self-check&hellip;</span></div>
+      <div class="card-b">
+        <div id="drop">
+          <strong>Drop an ultrasound image here</strong>
+          <span>or click to choose a file &mdash; PNG, JPEG, BMP or WebP</span>
+          <input type="file" id="file" accept="image/*" hidden>
+        </div>
+        <div style="text-align:center;margin-top:11px" id="samplerow">
+          <button class="btn-g" id="sample">Load the sample image</button>
+          <div class="status" id="samplenote" style="margin-top:6px"></div>
+        </div>
+
+        <div id="viewer" hidden>
+          <div class="stage"><canvas id="cv"></canvas></div>
+          <div class="hint"><span>&#9432;</span><span>Drag on the image to box the nodule. The box should be
+            <b>loose</b> &mdash; roughly the nodule plus 10&ndash;30%, the way the model was validated.</span></div>
+          <div class="toggles" id="toggles"></div>
+          <div class="actions">
+            <button class="btn" id="run">Analyse nodule</button>
+            <button class="btn-g" id="reset">Choose another image</button>
+            <span class="status" id="status"></span>
+          </div>
+        </div>
+        <div id="error" class="err" hidden></div>
+      </div>
+    </section>
+
+
+  </div>
+
+  <!-- ============ right: report ============ -->
+  <div>
+    <section class="card" id="scorecard" hidden>
+      <div class="card-h"><h2><span class="step">2</span>ACR TI-RADS score</h2></div>
+      <div class="card-b">
+        <div class="trbox" id="trbox"></div>
+        <div class="sum" id="sum"></div>
+      </div>
+    </section>
+
+    <section class="card" id="catcard" hidden style="margin-top:22px">
+      <div class="card-h"><h2><span class="step">3</span>Descriptors and why</h2>
+        <span class="status">click a row to open the evidence</span></div>
+      <div id="cats"></div>
+    </section>
+
+    <section class="card" id="methodcard" hidden style="margin-top:22px">
+      <div class="card-h"><h2>How the outline was drawn</h2></div>
+      <div class="card-b"><p id="method" style="margin:0;color:var(--muted);font-size:12.5px"></p></div>
+    </section>
+  </div>
+</div>
+
+    <section class="card" id="featcard" hidden style="margin-top:22px">
+      <div class="card-h"><h2>All 56 measurements</h2>
+        <div class="ftools"><input type="search" id="fsearch" placeholder="Filter features&hellip;"
+          aria-label="Filter features"></div></div>
+      <div class="tscroll"><table>
+        <thead><tr><th>Feature</th><th style="text-align:right">Value</th><th>What it measures</th></tr></thead>
+        <tbody id="ftbody"></tbody>
+      </table></div>
+    </section>
+
+<div class="foot">
+  <p style="margin:0 0 7px"><strong style="color:var(--muted)">Your image never leaves this device.</strong>
+  Everything runs in this page as plain JavaScript: nothing is uploaded and there is no server.</p>
+  <p style="margin:0 0 7px">The outline is drawn by a JavaScript port of <code>segment.py</code> (mean Dice 0.842 on 800 held-out
+  ultrasound frames), and the measurements by a port of <code>features.py</code>, both checked against the
+  original Python on the project's own images. One L2-regularised logistic model per
+  descriptor, fitted on the training split only, turns them into the probabilities above; fixed ACR rules turn
+  those into points and a TR level. No neural network, no learned image filters, no stored image data.</p>
+  <p style="margin:0">Reliability chips show each descriptor's ROC AUC on the 753-image validation split, so you
+  can see which parts of the score to trust. Margin descriptors are the weakest &mdash; ill-defined margin reaches
+  only 0.70 &mdash; and punctate foci are hard to see in small crops.</p>
+  <p style="margin:7px 0 0" class="mono" id="buildinfo"></p>
+</div>
+</div>
+
+<script src="js/model-data.js"></script>
+<script src="js/ndimage.js"></script>
+<script src="js/cv.js"></script>
+<script src="js/skimage.js"></script>
+<script src="js/segment.js"></script>
+<script src="js/features.js"></script>
+<script src="js/pipeline.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

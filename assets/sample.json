@@ -1,0 +1,10 @@
+{
+ "name": "synthetic-phantom.png",
+ "box": [
+  130,
+  100,
+  440,
+  330
+ ],
+ "note": "The sample is a synthetic phantom, not a patient image."
+}
