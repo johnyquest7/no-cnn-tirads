@@ -25,7 +25,7 @@
       <div class="sub">Hand-written segmentation and named features &mdash; no neural network anywhere in the pipeline</div>
     </div>
   </div>
-  <div class="warn"><strong>Research tool, not a medical device.</strong> Several descriptors are only moderately reliable. Every score below is shown with the evidence it came from so you can check it.</div>
+  <div class="warn"><strong>Research tool, not a medical device.</strong> Descriptors are only moderately reliable.</div>
 </header>
 
 <div class="grid">
@@ -99,17 +99,8 @@
     </section>
 
 <div class="foot">
-  <p style="margin:0 0 7px"><strong style="color:var(--muted)">Your image never leaves this device.</strong>
+  <p style="margin:0"><strong style="color:var(--muted)">Your image never leaves this device.</strong>
   Everything runs in this page as plain JavaScript: nothing is uploaded and there is no server.</p>
-  <p style="margin:0 0 7px">The outline is drawn by a JavaScript port of <code>segment.py</code> (mean Dice 0.842 on 800 held-out
-  ultrasound frames), and the measurements by a port of <code>features.py</code>, both checked against the
-  original Python on the project's own images. One L2-regularised logistic model per
-  descriptor, fitted on the training split only, turns them into the probabilities above; fixed ACR rules turn
-  those into points and a TR level. No neural network, no learned image filters, no stored image data.</p>
-  <p style="margin:0">Reliability chips show each descriptor's ROC AUC on the 753-image validation split, so you
-  can see which parts of the score to trust. Margin descriptors are the weakest &mdash; ill-defined margin reaches
-  only 0.70 &mdash; and punctate foci are hard to see in small crops.</p>
-  <p style="margin:7px 0 0" class="mono" id="buildinfo"></p>
 </div>
 </div>
 

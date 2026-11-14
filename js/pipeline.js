@@ -50,7 +50,7 @@ function score(feats) {
     const order = [...contrib.keys()].sort((a, b) => Math.abs(contrib[b]) - Math.abs(contrib[a])).slice(0, 5);
     out[lab] = {
       p: 1.0 / (1.0 + Math.exp(-logit)), logit, intercept: d.intercept,
-      auc: d.auc_visible, n_pos: d.n_pos_visible, title: IWSP.MODEL.label_title[lab] || lab,
+      auc: d.auc, few: d.few_cases, title: IWSP.MODEL.label_title[lab] || lab,
       drivers: order.map(k => ({feature: names[k], value: x[k], z: z[k], contribution: contrib[k],
                                 doc: IWSP.MODEL.feature_docs[names[k]] || ''})),
     };

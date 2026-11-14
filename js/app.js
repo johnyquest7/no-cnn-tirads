@@ -204,8 +204,6 @@ const runSelfCheck = () => (async () => {
   return {ok:false, error:String(err)};
 });
 offerSelfCheck();
-$('#buildinfo').textContent = `JavaScript port of segment.py (md5 ${IWSP.MODEL.source_md5['segment.py'].slice(0,8)}) and features.py ` +
-    `(md5 ${IWSP.MODEL.source_md5['features.py'].slice(0,8)}) · model data exported ${IWSP.MODEL.built}`;
 
 /* ---------- report ---------- */
 const RISK = {1:['Benign','No follow-up required under ACR TI-RADS.'],
@@ -214,13 +212,13 @@ const RISK = {1:['Benign','No follow-up required under ACR TI-RADS.'],
               4:['Moderately suspicious','FNA at ≥15 mm, follow at ≥10 mm.'],
               5:['Highly suspicious','FNA at ≥10 mm, follow at ≥5 mm.']};
 
-function rel(auc, n){
+function rel(auc, few){
   if (auc == null) return ['', '', ''];
-  if (n < 20) return ['low', `only ${n} validation case${n === 1 ? '' : 's'}`,
-                      'Too few cases in the validation split to judge this descriptor. Treat it as unverified.'];
+  if (few) return ['low', 'unverified',
+                   'Too few examples were available to judge this descriptor. Treat it as unverified.'];
   const c = auc >= 0.85 ? 'good' : auc >= 0.75 ? 'mid' : 'low';
-  return [c, `AUC ${auc.toFixed(2)} \u00b7 n=${n}`,
-          `Ranks a positive above a negative ${(auc*100).toFixed(0)}% of the time on ${n} held-out cases.`];
+  return [c, `AUC ${auc.toFixed(2)}`,
+          `Ranks a positive above a negative ${(auc*100).toFixed(0)}% of the time on images the model was not fitted on.`];
 }
 
 function render(d){
@@ -255,7 +253,7 @@ function render(d){
     const picked = c.chosen.length ? c.chosen.map(k => d.probs[k].title).join(' + ')
                                    : 'None detected';
     const lead = c.chosen[0] ? d.probs[c.chosen[0]] : null;
-    const [rc, rt, rtip] = lead ? rel(lead.auc, lead.n_pos) : ['','',''];
+    const [rc, rt, rtip] = lead ? rel(lead.auc, lead.few) : ['','',''];
     const el = document.createElement('div');
     el.className = 'cat';
     el.innerHTML = `

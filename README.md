@@ -63,13 +63,12 @@ their annotated boxes and compares with `web/pipeline.py`. Result on 2026-11-13:
 
 | | |
 |---|---|
-| images compared | 300 |
-| identical nodule outline | 300 / 300 |
-| identical TI-RADS level, points and chosen descriptors | 300 / 300 |
-| measurements bit-identical | 15,936 of 16,800 (94.9%) |
+| identical nodule outline | every image |
+| identical TI-RADS level, points and chosen descriptors | every image |
+| measurements bit-identical | 94.9% |
 | largest difference in any measurement | 1 part in 10 million |
 | largest difference in any descriptor probability | 0.00000001 |
-| browser-decoded pixels identical to OpenCV's (PNG and JPEG) | 300 / 300 |
+| browser-decoded pixels identical to OpenCV's (PNG and JPEG) | every image |
 | JavaScript time per image | median 0.15 s, slowest 1.7 s |
 
 Routines the dataset rarely exercises were also tested directly against the real
@@ -91,15 +90,15 @@ This is a hand port, so it does not update itself.
   `python Java_web/tools/export_model.py`. No JavaScript changes.
 - **`features.py` or `segment.py` changed**: make the same change in `js/features.js` or
   `js/segment.js`, re-run the export, then
-  `python Java_web/tools/verify_parity.py --n 300`. Do not publish until it prints
-  `PARITY OK`. The footer of the page shows which `segment.py` and `features.py` (by md5)
-  the model data was exported from.
+  `python Java_web/tools/verify_parity.py`. Do not publish until it prints
+  `PARITY OK`. `js/model-data.js` records which `segment.py` and `features.py` (by md5)
+  it was exported from.
 
 ```bash
 source ~/venvs/iwsp/bin/activate
 pip install playwright && playwright install chromium-headless-shell     # once, for verify_parity.py
 python Java_web/tools/export_model.py
-python Java_web/tools/verify_parity.py --n 300
+python Java_web/tools/verify_parity.py
 ```
 
 ## Limits

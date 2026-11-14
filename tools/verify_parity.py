@@ -1,7 +1,7 @@
 """Checks the JavaScript port against the desktop Python pipeline on real dataset images.
 
     pip install playwright && playwright install chromium-headless-shell     # once
-    python Java_web/tools/verify_parity.py --n 300
+    python Java_web/tools/verify_parity.py
 
 Developer tool; the website does not need it. It loads Java_web/js/*.js in headless Chromium and,
 for each image, compares with web/pipeline.py on this machine:

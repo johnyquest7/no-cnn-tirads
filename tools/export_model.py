@@ -31,6 +31,15 @@ sys.path.insert(0, str(ROOT))
 import pipeline  # noqa: E402
 
 SEG, FEAT, R = pipeline.SEG, pipeline.FEAT, pipeline.R
+
+
+def public_readout(R):
+    """The readout without dataset sizes: only what the page needs to score an image."""
+    out = {k: v for k, v in R.items() if k not in ("n_train", "n_visible_eval", "labels")}
+    out["labels"] = {lab: {"coef": d["coef"], "intercept": d["intercept"], "auc": d["auc_visible"],
+                           "few_cases": d["n_pos_visible"] < 20}
+                     for lab, d in R["labels"].items()}
+    return out
 SIGMAS = (1.0, 1.5, 2.0, 3.0, 3.5, 6.0)          # every sigma features.py / pipeline.py passes to scipy
 TOLERANCE = {"rel": 1e-5, "abs": 1e-8}           # page self-test: |js - desktop| <= rel * (|desktop| + abs/rel)
 
@@ -64,7 +73,7 @@ def main():
         "built": datetime.date.today().isoformat(),
         "source_md5": {n: hashlib.md5((ROOT / n).read_bytes()).hexdigest()
                        for n in ("segment.py", "features.py", "web/pipeline.py", "web/readout.json")},
-        "readout": R,
+        "readout": public_readout(R),
         "category_title": pipeline.CATEGORY_TITLE, "label_title": pipeline.LABEL_TITLE,
         "feature_docs": dict(FEAT.FEATURE_DOCS), "method": SEG.METHOD, "max_side": pipeline.MAX_SIDE,
         "seg": {
